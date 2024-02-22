@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Towards an agent to beat Skyrim</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="css.css" />
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Towards an agent to beat Skyrim</h1>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#towards-an-agent-to-beat-skyrim"
+id="toc-towards-an-agent-to-beat-skyrim">Towards an agent to beat
+Skyrim</a></li>
+<li><a href="#required-abilities" id="toc-required-abilities">Required
+abilities</a>
+<ul>
+<li><a href="#language-comprehension"
+id="toc-language-comprehension">Language comprehension</a></li>
+<li><a href="#behavioral-mode-switching"
+id="toc-behavioral-mode-switching">Behavioral mode switching</a></li>
+<li><a href="#live-learning" id="toc-live-learning">Live
+learning</a></li>
+<li><a href="#timewise-prediction" id="toc-timewise-prediction">Timewise
+prediction</a></li>
+<li><a href="#planning" id="toc-planning">Planning</a></li>
+<li><a href="#analogy" id="toc-analogy">Analogy</a></li>
+<li><a href="#navigation-and-environment-modeling"
+id="toc-navigation-and-environment-modeling">Navigation and environment
+modeling</a></li>
+<li><a href="#active-and-passive-exploration"
+id="toc-active-and-passive-exploration">Active and passive
+exploration</a></li>
+<li><a href="#prior-knowledge" id="toc-prior-knowledge">Prior
+knowledge</a></li>
+<li><a href="#objective-comprehension-and-game-state-modeling"
+id="toc-objective-comprehension-and-game-state-modeling">Objective
+comprehension and game state modeling</a></li>
+</ul></li>
+<li><a href="#other-considerations" id="toc-other-considerations">Other
+considerations</a>
+<ul>
+<li><a href="#condensed-and-combined-list-of-architectural-requirements"
+id="toc-condensed-and-combined-list-of-architectural-requirements">Condensed
+and combined list of architectural requirements</a></li>
+<li><a href="#multiscale-architectures"
+id="toc-multiscale-architectures">Multiscale architectures</a></li>
+<li><a href="#epiphenomenal-nature-of-most-requirements"
+id="toc-epiphenomenal-nature-of-most-requirements">Epiphenomenal nature
+of most requirements</a></li>
+<li><a href="#what-isnt-required-in-skyrim"
+id="toc-what-isnt-required-in-skyrim">What isn't required in
+Skyrim</a></li>
+<li><a href="#intermediate-game-targets"
+id="toc-intermediate-game-targets">Intermediate game targets</a></li>
+<li><a href="#a-zero-shot-game-player"
+id="toc-a-zero-shot-game-player">A zero-shot game player</a></li>
+</ul></li>
+<li><a href="#future-work" id="toc-future-work">Future work</a></li>
+<li><a href="#footnotes" id="toc-footnotes">Footnotes</a></li>
+</ul>
+</nav>
+<h1 id="towards-an-agent-to-beat-skyrim">Towards an agent to beat
+Skyrim</h1>
+<p>Game playing algorithms have progressed a lot in the last 20 years.
+The state of the art is mostly from Google DeepMind for competitive
+games like Go (AlphaGo, AlphaZero) and StarCraft (AlphaStar). DeepMind's
+<a href="https://arxiv.org/abs/2003.13350">Agent57</a> (and <a
+href="https://deepmind.google/discover/blog/agent57-outperforming-the-human-atari-benchmark/">here</a>)
+model can beat all 57 Atari 2600 games. DeepMind also created a
+generalist agent <a href="https://arxiv.org/abs/2205.06175">Gato</a>
+(and <a
+href="https://deepmind.google/discover/blog/a-generalist-agent/">here</a>)
+which can do many different things, including play games. There is also
+OpenAI Five which can play Dota 2 at expert levels. OpenAI was also able
+to make a Minecraft playing <a
+href="https://arxiv.org/abs/2206.11795">agent using video
+pretraining</a> (and <a
+href="https://openai.com/research/vpt">here</a>). Along with these well
+known companies' models, there are many, many lesser known models which
+each can play a single game well</p>
+<p>For a long time I've thought a pretty good goal for the development
+of game playing agents, and machine learning and AI in general, would be
+to beat <strong>Skyrim</strong> completely zero shot (ie: it knows
+nothing about Skyrim, and has not been exposed to any data from Skyrim
+at all), with no privileged information (ie: its given only what a
+person sees and hears), in real time</p>
+<p>Lately, I began to wonder whether it might actually be relatively
+easy to beat Skyrim. Perhaps a program that just points in the direction
+of the nearest quest marker <a href="#fn1" class="footnote-ref"
+id="fnref1" role="doc-noteref"><sup>1</sup></a>, and attacks when it
+sees a red dot on the compass, could do it?</p>
+<p>So I played through Skyrim, recording it and taking copious notes so
+I could scrutinize what exactly it would take for an agent to beat the
+game. Well, I can say it is <em>definitely not possible</em> to beat
+Skyrim without a very advanced, future-SOTA game playing agent. In fact,
+I might go so far as to say that an agent that can beat Skyrim zero shot
+like this must actually be an AGI</p>
+<p>I made a condensed list of what I noted the agent would be required
+to be able to do. Here's that list:</p>
+<h1 id="required-abilities">Required abilities</h1>
+<h2 id="language-comprehension">Language comprehension</h2>
+<p>This is one of the most important requirements of the agent. The
+agent must have <em>excellent language comprehension</em>. This includes
+both text and speech from multiple (mostly non-overlapping) speakers</p>
+<p>Although the agent could learn how to play the game by pressing keys
+randomly informed by prior knowledge, no text recognition massively
+decreases the chance it can piece together what it has to do and beat
+the game. From simple things like pressing <em>Ok</em> instead of
+<em>Cancel</em> on the tutorial popups and to <em>not enable survival
+mode</em>, to figuring out what to do when there is a quest information
+popup but no quest marker</p>
+<p>Text recognition necessarily includes some kind of internal visual
+text recognition facilities which preserve the location of the text on
+the screen for use as context for later comprehension and reasoning. So
+a simple OCR system probably won't work. This is fine, because other
+requirements necessitate <em>very</em> sophisticated visual
+comprehension anyway</p>
+<p>For some sections, understanding what other characters are saying is
+only a minor convenience. Like, for instance, when Irileth says that she
+will "see you at the watch tower", which has a quest marker <a
+href="#fn2" class="footnote-ref" id="fnref2"
+role="doc-noteref"><sup>2</sup></a> pointing to it, where otherwise the
+closest quest marker is on Irileth herself, prompting the agent to
+simply follow her, when it is faster to go to the second quest marker at
+the watch tower and explore</p>
+<p>Another example is when Lydia initiates a dialog with you when you're
+leaving Dragonsreach (which is the only time she does this) and there is
+a dialog option "Follow me. I need your help." which, if selected, makes
+the rest of the game dramatically easier as Lydia then permanently
+follows you and helps fight enemies. But that dialog option isn't the
+first dialog option, and since always using the first dialog option
+along with pressing <em>Tab</em> to exit dialogs at that point in the
+game is the only strategy you need to progress, the agent might not
+select the option to have Lydia follow them. This isn't a necessary
+thing to do to progress the game, though, it just makes the rest of the
+game much easier</p>
+<p>However, there are <em>many</em> sections which <em>absolutely</em>
+require you to listen or read what other characters are saying to
+understand what to do. There is not always a quest marker, and
+occasionally what you have to do is quite specific and
+<em>extremely</em> unlikely to be found through random actions</p>
+<p>Here are some examples where the quest marker isn't enough, and you
+need language comprehension to proceed:</p>
+<ul>
+<li><p>When you first get to High Hrothgar, the quest marker disappears
+but you are told earlier that you need to talk to the Greybeards inside.
+Then, inside, Arngeir tells you to blast him with the Unrelenting Force
+shout (a special ability in the game that pushes characters ahead of you
+away), and a text prompt tells you to "demonstrate" the shout. It is
+otherwise <em>unfathomably</em> unlikely that the agent randomly selects
+the shout and uses it on Arngeir without understanding via speech and
+text that it needs to do so</p></li>
+<li><p>Similarly, the Greybeards tell you to blast their force ghosts
+with Unrelenting Force, there is also a textual prompt on screen. And,
+after you get the Whirlwind Sprint shout (an ability that makes you
+briefly run forward very quickly), there is no explicit textual prompt
+telling you to switch to it and use it when the gate opens, but Arngeir
+does verbally tell you to use it, and he tells you when to use
+it</p></li>
+<li><p>After you talk to Delphine and are following her into her
+basement, she stops at the hidden staircase and tells you to shut the
+door. There is no other prompt to do so, and you can't proceed without
+shutting the door. Though, this also might be inferred without language
+comprehension if the agent has prior knowledge about these sorts of
+situations</p></li>
+<li><p>When giving Malborn your equipment to take into the Thalmor
+Embassy, there is a text prompt for you to do so and Malborn says to.
+The inventory selection screen opens regardless whether you understand
+what's happening, . This isn't strictly necessary to do, though, as its
+possible to proceed through the Thalmor Embassy by using only items you
+find inside it</p></li>
+<li><p>Inside the Thalmor Embassy, Malborn tells you to cause a
+distraction, and Razelan (the scene-maker) tells you he can cause a
+scene, but that he needs wine. There is no textual prompt or quest
+marker (besides the one on Malborn <a href="#fn3" class="footnote-ref"
+id="fnref3" role="doc-noteref"><sup>3</sup></a>) telling you what to
+do</p></li>
+</ul>
+<p>After some point in the game, I stopped noting each time language
+comprehension is needed and just assumed it wasn't possible to get that
+far into the game without excellent language comprehension. There are
+many, many more cases than the ones I've listed, and its unlikely the
+agent would progress past all of them without language comprehension</p>
+<p>Luckily, modern LLMs have excellent language comprehension, and
+multimodal models can infer across different inputs (eg: understanding
+what is heard being said related to what is seen)</p>
+<h2 id="behavioral-mode-switching">Behavioral mode switching</h2>
+<p>By this I mean that the required behaviors to beat games are very
+<em>modal</em>, and that the various tasks in games might each require
+vastly different behaviors from one another, and they require the
+ability to seamlessly switch between those various behavioral modes</p>
+<p>The first and most obvious example of this is switching between the
+<em>using a menu</em> mode and the <em>playing the main game</em> mode.
+When using a menu, the movement keys move the active UI element
+indicator, and the mouse now controls a cursor. While, in the main game,
+the movement keys control your character's movement, and the mouse
+rotates your character</p>
+<p>An example of a non-superficial behavioral mode is when an enemy
+attacks the agent, they have to switch from whatever they were
+previously doing to attacking the enemy. Then, once they've defeated the
+enemy, they can switch back to whatever they were doing</p>
+<p>Behavioral mode switching is probably an incidental epiphenomenon of
+regular training, so it might not inform the model's architecture. See
+the "Epiphenomenal nature of most requirements" section below for more
+on this</p>
+<h2 id="live-learning">Live learning</h2>
+<p>Live learning is learning that takes place when the model is
+<em>live</em>, ie: when the model is actively being used. This is in
+contrast to <em>parametric learning</em> <a href="#fn4"
+class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a>,
+which takes place during training</p>
+<p>This is obviously necessary, and seemingly the usual epiphenomenal
+live learning from regular training <a href="#fn5" class="footnote-ref"
+id="fnref5" role="doc-noteref"><sup>5</sup></a> would work. However, the
+agent will have to remember certain details and learned stuff for an
+<em>arbitrarily long time</em>. It isn't enough to just feed the last N
+frames, seconds of audio, and input events into the model because you
+would have to potentially feed <em>all frames, audio, and input events
+from the start of the game into the model</em></p>
+<p>Since the model must play the game in real time, some storage or
+compression mechanism is absolutely necessary for arbitrarily long live
+learning to be feasible (also see <a href="#fn6" class="footnote-ref"
+id="fnref6" role="doc-noteref"><sup>6</sup></a>). So its likely live
+learning is not entirely an epiphenomenon of training, and directly
+informs the agent's architecture and functionality in general</p>
+<p>Some sub-requirements in the category of live learning are:</p>
+<ul>
+<li><p>Skills and associations such as which keys to press to perform
+which action, and strategies and tactics for dealing with enemies and
+puzzles</p></li>
+<li><p>What basic game elements are and do. eg: Quest markers, the
+compass, and the inventory menu</p></li>
+<li><p>Memory of what characters said and did</p></li>
+<li><p>Recognition of symbols. eg: The Dragonborn symbol at Sky Haven
+temple</p></li>
+<li><p>Association of the quest marker with other progress indicators
+like trails, doors, and characters</p></li>
+</ul>
+<p>One particular example of non-trivial live learning is: right after
+you get out of the Helgen cave at the start of the game, the most
+obvious path to the next quest marker in Riverwood is a straight line.
+However, there is a cliff that will very likely kill you if you go in a
+straight line. If the agent can recognize death as a thing to be avoided
+and remember that particular cliff, then it can go around and
+survive</p>
+<p>Another example is learning that the open eye symbol when crouched
+means you won't succeed at stealing something. This is important for the
+required pickpocket quest in Riften</p>
+<h2 id="timewise-prediction">Timewise prediction</h2>
+<p>This is the ability to predict or estimate what will likely happen in
+the near and far future. Timewise prediction itself doesn't necessarily
+inform the model's architecture, because the model already has a memory,
+and the ability to predict forward in time is likely just an
+epiphenomenon of training (ie: the model learns internal algorithms for
+prediction naturally from training). Though, certain architectures may
+be preferred because they perform better in timewise prediction once
+trained</p>
+<p>This isn't a necessary ability just for Skyrim, its probably
+necessary for almost all games. Though, since its epiphenomenal, it is
+likely occurs in all general game players. However, It may not be
+obvious, since all of the results of predictions are stored in the
+model's usual, encoded, internal memory forms, or even if it has no
+memory, in its immediate decisions, which the agent may have learned to
+treat as predictions to inform future decision making</p>
+<p>Some examples of this (in Skyrim) include:</p>
+<ul>
+<li><p>Being able to see cause and effect. eg: I fell of this cliff
+earlier, I'm walking towards it now, I predict I will fall and die;
+that's undesirable so I will choose a different path. This also
+includes: switches for opening doors and lowering bridges, traps,
+etc</p></li>
+<li><p>Recognition of what is a temporary blockage, or a blockage that
+will soon change. eg: Hadvar is walking this way, he'll probably unlock
+the door, so I just have to wait</p></li>
+<li><p>Resource management through time, especially health resource
+management. eg: I see a few health potions, I'll go get it and use one
+to restore my missing health, then I'll keep a few more because it seems
+like there is a boss coming and I'll need them</p></li>
+<li><p>Understanding obstacles that move in time. eg: This cylinder will
+push me off that ledge if I walk right now, but in a moment it will be
+safe</p></li>
+</ul>
+<h2 id="planning">Planning</h2>
+<p>Planning is like doing a search using timewise prediction for
+possible futures that accomplish some goal. Like timewise prediction
+itself, this is likely an epiphenomenon of training, so its probably not
+meaningful to say what form it actually takes internally. Again, certain
+architectures might result in agents that plan better</p>
+<p>Some examples are:</p>
+<ul>
+<li><p>Chaining events to progress. eg: I have to give this guy wine, to
+cause a distraction, then talk to the wood elf, so we can continue into
+the back room</p></li>
+<li><p>Changing environment state. eg: Brynjolf said to talk to him in
+the market in the day, and its currently night, I need to wait, then I
+can talk to him</p></li>
+<li><p>Active exploration when the agent hits an impasse. eg: I see
+there is a quest marker, but I'm not sure how to get to it, I can't keep
+going straight towards it, so I'll look around to find a new path, then
+I'll continue toward the quest marker</p></li>
+</ul>
+<h2 id="analogy">Analogy</h2>
+<p>Most of the puzzles require the ability to create an ad-hoc analogy
+(which is like an abstract mapping between similar structures) between
+parts of the environment with the solution to the puzzle and
+interactable parts of the environment which you can enter the solution
+into</p>
+<p>For instance, in the first Bleak Falls Barrow puzzle, you have to
+look above a switch on the ground at two symbols and one symbol on the
+ground which would otherwise be between the two other symbols. Then you
+have to analogically map this onto the turnable switches in the room to
+get the solution</p>
+<p>Similarly, in the Bleak Falls Barrow door puzzle, you have to look at
+the puzzle key in your inventory (which you get from Arvel's body
+earlier <a href="#fn7" class="footnote-ref" id="fnref7"
+role="doc-noteref"><sup>7</sup></a>) and map the symbols on the key to
+the symbols on the door</p>
+<p>In order to use strategies, you have to create an analogy between the
+generic version of the strategy and the situation you want to use it in.
+In the BFB door puzzle, for example, you could use the <em>brute
+force</em> strategy to find the solution. You map the strategy -- set up
+each possible solution and check each one in turn -- onto the puzzle to
+get a reified strategy: rotate the door rings one at a time and check
+each for the solution in turn</p>
+<h2 id="navigation-and-environment-modeling">Navigation and environment
+modeling</h2>
+<p>This is a very important one. The agent has to be able to find its
+way around an environment that is <em>pretty rough</em> and extremely
+nonlinear. This usually means trying to go in the direction of a quest
+marker, when there isn't an obvious way to go in that direction. It also
+probably involves backtracking, indicating memory of where the agent has
+physically been and possibly some kind of search procedure (which likely
+comes from the agent's planning abilities) are necessary</p>
+<p>This is also necessarily requires multiscale modeling (see the
+section below about multiscale architectures) of the agent's
+environment, with scales from the immediate scale (several seconds
+around), to distant scale (a minute ahead), to very large scale (10+
+minutes ahead), probably with an analogy to the map screen as well</p>
+<p>Since the agent is only given the screen image as input, it has to
+estimate the screen depth to the surrounding environment (probably based
+on movement and prior knowledge of object sizes). It also has to
+remember the environment its already seen, and paths its already taken,
+and be able to infer what is at locations it can't see</p>
+<p>Of all the requirements, I think environment modeling might be the
+most likely candidate for using external algorithms to make it easier
+for the agent and to take the place of some training time. This would
+look like making a separate program that constructs a 3d representation
+of the environment from the screen image input, which is then fed as
+input along with the regular screen image input into the agent. There
+are problems with this approach, of course (see the "Epiphenomenal
+nature of most requirements" section below)</p>
+<p>Some examples of this:</p>
+<ul>
+<li><p>Getting into Whiterun is very non-trivial. There are many little
+alcoves and dead ends that, when you're using the heuristic that 'stick
+to the road' or 'road means progress', you don't explore. The agent
+would have to learn a heuristic like this live, have learned it in
+training, or do a search that involves going up each dead end</p></li>
+<li><p>Ascending the Throat of the World (the tallest mountain in the
+game) toward High Hrothgar (a temple / castle on this mountain) for the
+first time (or each time, if the agent doesn't discover fast travel; see
+the passive exploration section below) is extremely nonlinear. The path
+up it is actually sort-of like a fractal spiral. At almost no point can
+you go directly toward the quest marker, and potential dead ends are
+everywhere</p></li>
+<li><p>In general, there are obstacles (rocks, trees, cliffs, walls,
+etc) literally everywhere and its not necessarily clear what is an
+obstacle and what isn't. ie: Deciding whether some combination of floor
+geometry, or a wall texture, is a physical obstacle or not is
+non-trivial</p></li>
+</ul>
+<h2 id="active-and-passive-exploration">Active and passive
+exploration</h2>
+<p>Active exploration is <em>exploring to explicitly progress toward the
+primary objective of the game</em>. Passive exploration is <em>exploring
+for unknown resources for the future, and otherwise non-objective-based
+exploration</em>. Active exploration is more like a search procedure and
+planning with uncertainty, whereas passive exploration is more like a
+heuristic for discovery of resources the agent doesn't even know it
+needs. Active exploration deals mainly with known unknowns, and passive
+exploration deals more with unknown unknowns. While actively exploring,
+the agent knows something about what it will find and has a plan that
+requires finding that thing, with passive exploration the agent doesn't
+necessarily know what it will find, and doesn't necessarily even know it
+will find anything. Active exploration is mandatory, passive exploration
+is optional</p>
+<p>The ability to actively explore the environment is absolutely
+required. From navigation to puzzles, there are many, <em>many</em>
+cases where the agent will have to search its environment to continue
+making progress</p>
+<p>By definition, passive exploration doesn't factor into immediate
+progress. However, early passive exploration can take the place of later
+active exploration. For example, passively exploring the skills menu
+early on can take the place of actively exploring how to improve your
+magicka level later on</p>
+<p>Examples of active exploration:</p>
+<ul>
+<li><p>Backtracking and finding a way ahead when you hit a dead end. eg:
+I was walking toward the quest marker, then I hit a wall, I should look
+down that hallway I saw earlier</p></li>
+<li><p>Exploring to make progress without a quest marker. eg: I'm in a
+room full of people with no quest marker, I should talk to the
+people</p></li>
+<li><p>Seeking out information to know how to proceed, or to help
+proceeding. eg: Brynjolf said to steal Madesi's ring, but who is Madesi?
+I should look around</p></li>
+<li><p>Picking up resources explicitly for a later challenge. eg: I'm
+going to be fighting a dragon, I should collect health potions</p></li>
+<li><p>Solving puzzles. eg: There is a switch to a door but it shoots me
+with arrows when I pull it. But I wonder what these symbols on the wall
+are for. Similarly: I'm not sure what these buttons do, I'll just press
+them and see if I can figure out how to solve this puzzle</p></li>
+</ul>
+<p>Examples of passive exploration:</p>
+<ul>
+<li><p>Exploring containers and dead enemies as you pass them. eg: That
+guy Arvel just died, there's his body, I wonder what he's holding.
+Similarly: There is a chest in the corner of the room, maybe there's
+stuff in it</p></li>
+<li><p>Exploring the interface. eg: I pressed the M key and not I'm
+looking at a map, I wonder what happens if I click on one of these
+locations. And: I went into the skills menu to add points to my magicka,
+there other things in there, I wonder what they do</p></li>
+<li><p>Exploring new strategies. eg: I'm trying to get up this mountain
+and the path is long, I wonder if I can climb that almost-climbable
+slope by jumping</p></li>
+<li><p>Miscellaneous interaction with things. eg: I passed this thing
+and it said I could press E to interact with it, I wonder what it does
+when I do so</p></li>
+<li><p>Passive collection of items. eg: There's a bunch of weapons and
+armor in this chest, maybe I should take some of it</p></li>
+</ul>
+<p>Both active and passive exploration are probably epiphenomena of
+training (ie: they emerge as behaviors so the agent can finish
+objectives during training), but I suspect that a sort of <em>curiosity
+heuristic</em> -- which controls how much the agent wants to explore --
+might be embedded in the agent's model</p>
+<p>My sense is that this hyperparameter (or set of hyperparameters) has
+a wide range where the agent can still finish games, but a much more
+narrow range where the agent finishes games quickly. For instance, you
+have to passively explore the map menu to discover fast travel in
+Skyrim, but without fast travel the game takes <em>much</em> longer. If
+the agent's tendency to passively explore is not sufficiently high, it
+may just walk everywhere, taking much longer. Though, on the other hand,
+if the agent's passive exploration tendency is too high, it might devote
+too much of its time to exploring, and finish the game slower</p>
+<p>Similarly, for active exploration: if the agent's tendency to
+actively explore isn't high enough it might not start searching for more
+varied solutions to a problem its facing, and take much longer before it
+gets to those solutions. For example, if it tries to go up a dead end
+that appears walkable, but isn't (eg: on the walk up to High Hrothgar),
+it might try various ways to continue when it just can't (eg: jumping up
+rocks). With an optimal active exploration hyperparameter value, the
+agent would more quickly backtrack and find the fastest solution (eg:
+the real path up the mountain). And if the agent's tendency to actively
+explore is too high, it might start searching for solutions to
+non-problems prematurely. For example, if it sees a likely branch in an
+otherwise linear corridor and it takes the branch, but that moves away
+from the direction of the quest marker and just leads to a dead end. It
+would be much better off not taking the branch and sticking with the
+'walk straight toward the quest marker' strategy</p>
+<h2 id="prior-knowledge">Prior knowledge</h2>
+<p>Prior knowledge is parametric <a href="#fn8" class="footnote-ref"
+id="fnref8" role="doc-noteref"><sup>8</sup></a> knowledge learned during
+training. Its what the agent <em>brings in</em> to the game that it
+learned from other games and its training in general. This is everything
+from what an enemy is and the role of attacking, to what a bed is, what
+time is, and how gravity works</p>
+<p>There are certain pieces of prior knowledge that are essentially
+mandatory for the agent to have:</p>
+<ul>
+<li><p>Combat and what an enemy is, what attacking is, what enemy death
+is, what their own death is, that death is bad for progress, that being
+injured is bad for progress, that healing is good for progress,
+etc</p></li>
+<li><p>Potentially some general strategies for solving combination
+puzzles like the symbol switch puzzles and the claw door puzzles.
+Particularly, guessing and checking and brute forcing</p></li>
+<li><p>That the web walls, like the one in BFB, are breakable. This is
+non-obvious, but there is absolutely no prompt for you to attack the web
+wall to break it, and its unlikely the agent would randomly try this
+without prior knowledge of breakable walls, and spider webs</p></li>
+<li><p>How inventories work, how equipment works, particularly how
+weapons and armor work, how consumables work, etc</p></li>
+<li><p>How cutscenes work, and what might amount to a cutscene without
+being one explicitly. eg: The opening carriage ride, when getting on a
+horse, getting into a carriage, riding Odahviing (a dragon),
+etc</p></li>
+</ul>
+<p>These are all learned from other sources: other games, text, video,
+etc. It might not be necessary to train the agent on videogames
+explicitly for this prior knowledge, of course, and certainly some prior
+knowledge would come from text, images, and video</p>
+<p>One important note about this: if the agent's training includes text,
+images, or video <em>about Skyrim</em>, then the agent will have prior
+knowledge about Skyrim. So any Skyrim-related training material should
+not be used, or else the agent will not be playing Skyrim completely
+zero-shot</p>
+<h2 id="objective-comprehension-and-game-state-modeling">Objective
+comprehension and game state modeling</h2>
+<p>Since the agent would be playing Skyrim completely zero-shot, and it
+receives no privileged information (only the current frame and keyboard
+state as input), but it also has complete the game, it has to be able to
+receive an instruction (probably as an video or image prompt just before
+starting the game itself), comprehend the instruction (language
+comprehension) and move toward a perceived state where the instruction
+is satisfied, and where the instruction is also <em>actually</em>
+satisfied. Its what I've been calling objective comprehension and
+objective modeling and its definitely very non-trivial</p>
+<p>To do this, the agent has to be able to comprehend the game as a game
+that can be <em>beaten</em> in the sense that an objective can be
+accomplished within it, and so it has to have some model of the game
+itself. Not the game's content, but the state of the game as a game (a
+simulation where certain objectives can be satisfied)</p>
+<p>For Skyrim, the objective prompt would probably be like: "Kill
+Alduin, then talk to Paarthurnax". The agent then has to play the game
+enough to establish what the objective prompt even means (a form of
+active exploration), and be able to decide at all times which of its
+actions takes it closer to satisfying the objective prompt</p>
+<p>There are many cases in the game where its pretty non-obvious what
+you should be doing to make progress in the main line of quests (the
+sequence of quests you have to beat to finish the game). This includes
+whenever a new side-quest starts, because there's nothing to distinguish
+side-quests and main line quests but their content and context. The
+agent has to guess / estimate which quests will take it toward
+satisfying the objective prompt</p>
+<h1 id="other-considerations">Other considerations</h1>
+<h2
+id="condensed-and-combined-list-of-architectural-requirements">Condensed
+and combined list of architectural requirements</h2>
+<p>Here is a very highly condensed set of things that constrain the
+architecture of the agent, taking into account which of the above
+requirements appear to be epiphenomenal and which don't:</p>
+<ul>
+<li><p>Language comprehension</p></li>
+<li><p>Timewise prediction across multiple subsystems (environment
+model, narrative, game model, model of self, etc)</p></li>
+<li><p>Branched search in time using timewise prediction
+ability</p></li>
+<li><p>Inference <a href="#fn9" class="footnote-ref" id="fnref9"
+role="doc-noteref"><sup>9</sup></a> across multiple subsystems</p></li>
+<li><p>Internal representations of:</p>
+<ul>
+<li><p>The environment (3d and 2d (for training on other
+games))</p></li>
+<li><p>Narrative timeline (ie: events the agent expects to see in the
+future)</p></li>
+<li><p>Self-state (memory for intentions, plans, subgoals, etc)</p></li>
+<li><p>Game-state (score, inventory, etc)</p></li>
+</ul></li>
+</ul>
+<p>There may be an architecture that treats these points mostly
+homogenously. The modules such an architecture uses would probably be
+multiscale (see next section), have a timewise component built in (eg:
+operate on a sequence of previously-current representations), and
+include inference and error correction faculties</p>
+<p>A unified, entirely-internal architecture like this would probably be
+<em>quite slow</em>. See the bottom of the "epiphenomenal nature of most
+requirements" section below</p>
+<h2 id="multiscale-architectures">Multiscale architectures</h2>
+<p>The agent is likely to have a multiscale architecture, or its
+architecture's components will be multiscale. Multiscale architectures
+are architectures which have multiple scales that are each either a
+lossy model (ie: missing some information) of another scale, or the
+external world. Picture: a pyramid, where the base of the pyramid is the
+to-scale representation of the external world, and each subsequent
+higher layer is a smaller representation of the layer below it. Another
+analogy: look at your environment around you, that is scale-0; now look
+at a map of your town, that is scale-1. The map is a lossy version of
+scale-0 if you were to go around building that mental representation of
+the whole thing</p>
+<p>An example of a single-scale architecture is an LLM that predicts the
+next token in a sequence directly. Whereas, a multiscale version of that
+architecture chunks the input text into token sequences at different
+scales corresponding approximately to phrases, sentences, paragraphs,
+sections, etc and predicts the next tokens for each in parallel, subject
+to the condition that each of the scales remain consistent with one
+another</p>
+<p>There are also in-place multiscale models. These don't use one
+structure per scale, but just one structure with features of different
+scales encoded in it. These are heterogeneous structures that mix
+features of different scales in the same location. For example, picture
+a town around you: you ignore the small scale details of the buildings
+and instead the buildings themselves can be represented by atomic or
+nearly atomic building representations. Another example: with LLMs, you
+can take common sequences of tokens and replace them in-place with
+single tokens or shorter token sequences. Humans do this (chunking, see
+<a href="#fn10" class="footnote-ref" id="fnref10"
+role="doc-noteref"><sup>10</sup></a>) very aggressively</p>
+<h2 id="epiphenomenal-nature-of-most-requirements">Epiphenomenal nature
+of most requirements</h2>
+<p>Unfortunately, most of the agent's required abilities are probably
+epiphenomena of training and can't be as effectively reasoned about by
+the agent's developers as human-comprehensible architectures and
+algorithms which give the agent those abilities</p>
+<p>An example of this is pathfinding and navigation around obstacles.
+There are certain algorithms for pathfinding (like A*) which are
+extremely fast, relatively efficient, and are human-comprehensible, but
+if the agent's internal representation of its environment is encoded in
+some learned form (which is probably the case), then you might not be
+able to design an algorithm for this learned form specifically</p>
+<p>The agent using learned, internal algorithms is important for the
+agent's generality, too. The agent might, for instance, use some of the
+same internal algorithms for navigation as is does for language
+processing and comprehension. This would be more efficient and
+generalizes better (see multimodal models) than with external,
+human-designed algorithms. Humans' internal algorithms can do this. For
+instance, when I mentally solve a simple equation like
+<code>a x + b = 0</code>, I visualize the equation and move the parts
+around spatially, as if I was doing it on paper. So I'm using visual
+processing to solve a textual problem</p>
+<p>Note: you <em>can</em> give the agent the results of external
+algorithms, which it could then learn to use in its own internal
+algorithms, potentially allowing it to train faster (because the agent
+then doesn't have to learn the algorithm's internal equivalent) and
+perform better (because the external algorithms are faster and more
+precise). Picture: building a 3d environment from the games' frames,
+then handing that environment to the agent. But, since the external
+algorithm doesn't take the agent's learned, internal forms as input, the
+agent can't learn to use the algorithms generally. It is conceivable
+that external algorithms could be built to be general enough to take an
+agent's internal, learned forms, and be given to the agent to use
+however it sees fit, and the agent could learn how to use them. But, if
+you're training the agent using backprop, that creates the issue of how
+you calculate the gradient of your external algorithm. Its a complicated
+problem with difficult but potentially lucrative solutions</p>
+<p>There is likely an optimal combination of external and internal
+algorithms, but it appears that most modern SOTA models for various
+tasks (eg: LLMs like GPT-4) use mostly or entirely internal algorithms.
+That means <em>all</em> behaviors are entirely learned, ie: entirely
+internal. I don't know this, but, again, it is <em>probably</em> optimal
+to have some external algorithms</p>
+<p>The external vs internal (given vs learned; dedicated vs generalized)
+algorithm problem is especially problematic because we want the agent to
+be able to play Skyrim in real time. Since external algorithms tend to
+be very fast, but internal algorithms tend to be very slow, the agent's
+architecture will probably have to make use of both</p>
+<p>Its conceivable to me it might be easier to use external algorithms
+in a superagent (agent composed of agents) architecture. That would look
+like an agent that has at least one agent performing internal tasks as
+if those internal tasks were another game. Since agents tend to be
+general problem solvers, its conceivable that these internal agents
+(subagents) like this could be trained separately, which might
+drastically reduce training time and cost</p>
+<h2 id="what-isnt-required-in-skyrim">What isn't required in Skyrim</h2>
+<p>Combat is never very demanding. You essentially just aim the
+crosshairs at enemies and click repeatedly. That is all that is required
+of combat. Though, the agent will almost certainly have to enter into
+their inventory to heal while in combat</p>
+<p>Archery is never required. Its hinted at in the beginning that you
+can use a bow but is never necessary. Though, if you don't use any
+projectile attacks, dragon fights are a game of waiting for it to land
+and attacking it while its on the ground</p>
+<p>Magic is required <em>once</em>, when you need to demonstrate a
+conjuration spell to get into the College of Winterhold. This also is
+the only point the agent has to go into their skills menu to do anything
+(they have to increase their magicka stat three times; though this also
+depends on what race they selected at the start, and what they're
+wearing). Note: you technically don't have to do this, you can talk to
+Septimus Sigmus directly without going into the college, but its
+probably extremely unlikely the agent finds him without prior
+knowledge</p>
+<p>Putting points into skills is never required. You do have to upgrade
+your magicka stats, which also requires officially accepting levels up,
+but you don't ever have to upgrade your skills</p>
+<p>Sneaking for stealth is technically never required. At the start of
+the game its heavily encouraged you sneak past a bear and in Riften you
+have to crouch to reverse pickpocket Madesi's ring onto Band-Shei</p>
+<p>Jumping is never required. Or, at least, I may have missed a point
+where jumping is required because jumping is so natural I might not have
+noticed, but I was specifically looking for when I would have to jump
+even once, and I didn't note it. Falling off things is required, but
+jumping isn't. Not even at the start of the game where you are
+explicitly told to jump; you don't have to jump. Jumping <em>does</em>
+make certain sections much easier, and it makes the game <em>much</em>
+more interesting, but an agent that doesn't passively discover jumping,
+and never jumps, can still just as easily beat the game</p>
+<h2 id="intermediate-game-targets">Intermediate game targets</h2>
+<p>Which games could a agent's model be trained on so it could actually
+beat Skyrim zero shot? I'm fairly confident that if an agent can beat
+Skyrim it can probably beat almost any other game in existence. For
+other games as targets, though, that probably isn't true. eg: If you
+wanted to create an agent that could beat the game <a
+href="https://en.wikipedia.org/wiki/Snake_(video_game)">Snake</a>, you
+wouldn't need language comprehension, behavioral switching, reasoning,
+inference, analogy, passive exploration, navigation, environment
+modeling, or much concrete prior knowledge. So <em>Snake</em> would be a
+good intermediate target for creating an agent that needs active
+exploration, minimal prior knowledge, planning, game state modeling, and
+objective comprehension</p>
+<p>Here are some other games and game categories I'm familiar with,
+unordered. These aren't necessarily intermediate game targets, but
+targets in general. I'm primarily listing these games particularly
+because they are iconic, memorable, and I have experience with them</p>
+<ul>
+<li><p>Arcade and phone games like: Snake, Tron, Street Fighter, Tetris,
+Pac-Man</p></li>
+<li><p>Old console games: Atari and SNES games, Mario (World, Bros,
+etc), Metroid</p></li>
+<li><p>Shooters: Doom (old and new), Halo, Half-life (old and well...
+old), Far Cry</p></li>
+<li><p>Rogue-likes: Binding of Isaac, Nuclear Throne, Enter the
+Gungeon</p></li>
+<li><p>Minecraft</p></li>
+<li><p>Undertale</p></li>
+<li><p>Papers Please</p></li>
+<li><p>Diablo 1, 2</p></li>
+</ul>
+<p>Here are some games I think might be vastly more difficult for an
+agent to beat than Skyrim, for a variety of reason:</p>
+<ul>
+<li><p>Myst</p></li>
+<li><p>The Witness, Taiji</p></li>
+<li><p>Terraria</p></li>
+<li><p>Old 2d turn based rpgs: Chrono Trigger, Final Fantasy XYZ,
+Pokemon RGB</p></li>
+<li><p>Noita (difficulty depending on objective prompt; from relatively
+easy to almost impossible)</p></li>
+<li><p>Baba Is You</p></li>
+<li><p>Portal</p></li>
+<li><p>True rogue-likes: Rogue, NetHack, CDDA, ToME, Dwarf Fortress,
+ADOM, etc</p></li>
+<li><p>Kerbal Space Program</p></li>
+<li><p>Factorio</p></li>
+</ul>
+<p>These other games on the same engine are valid, technically, but may
+be too close to Skyrim:</p>
+<ul>
+<li><p>Fallout 3, New Vegas, and 4</p></li>
+<li><p>Starfield</p></li>
+<li><p>Elder Scrolls: Morrowind and Oblivion</p></li>
+</ul>
+<p>Keep in mind: if the agent is <em>trained</em> on a particular game,
+and the training is successful, the agent will be able to beat that
+game. So its conceivable that training the agent on games that are
+<em>generally</em> harder than Skyrim will enable it to beat Skyrim zero
+shot more easily than if it was trained on easier games. Though, also
+keep in mind that training directly on hard games means the agent is
+learning those games parametrically, and much of the difficulty of those
+games comes from having to figure the games out live, zero-shot</p>
+<p>Also note that during training, an agent doesn't necessarily have to
+play the game in real-time. And, that some games might be really
+difficult to run faster than real time for training-data-collection
+purposes. Old, easy-to-run-fast, games are probably better for training
+than newer games with intense graphical or processing requirements
+because its easier to collect training data from them at faster than
+real-time. I consider Skyrim in the category of graphically and
+processing intensive games</p>
+<p>Its likely that you can train particular <em>parts</em> of the
+agent's model in another model <a href="#fn11" class="footnote-ref"
+id="fnref11" role="doc-noteref"><sup>11</sup></a> that provides its own
+privileged objective inputs and doesn't require an objective prompt,
+thus eliminating language comprehension and objective prompt
+comprehension. Later, you can take those parts of the model and add them
+to a model with language processing and objective-prompt components. For
+example, you could train a certain model to play <em>Tetris</em> so that
+it optimizes for the game's score (as a privileged input), or so it
+optimizes for numbers of wins, then take parts of that model and embed
+it into another agent that uses an objective prompt and game modeling
+instead of privileged inputs</p>
+<h2 id="a-zero-shot-game-player">A zero-shot game player</h2>
+<p>Its conceivable that with a sufficiently flexible architecture an
+agent could beat Skyrim completely zero-shot, with no privileged
+information, in real time, <em>and with no prior knowledge about games
+in general</em>. This doesn't mean the agent wouldn't have to be able to
+do the other things I laid out above, but just that prior knowledge
+about games might be optional. A human, even if they had no experience
+playing games might be able to do this, indicating an AGI agent could do
+it</p>
+<p>This sort of agent could be trained on other tasks (probably
+artificial, contrived tasks) and because those other tasks could be made
+to be really fast, the agent would probably train much faster. Though,
+the agent would probably take <em>much</em> longer to beat Skyrim, as it
+would have to figure out <em>everything</em>, not just Skyrim-specific
+stuff, like: how to control the player, what enemies and combat are,
+what an inventory is, how to heal and use items, etc</p>
+<h1 id="future-work">Future work</h1>
+<p>A project to make a game playing agent that can beat Skyrim
+completely zero-shot, with no privileged inputs, and in real time, would
+be a massive undertaking, requiring huge amounts of resources and many
+subprojects, including researching new architectures, developing
+training programs, and training intermediate agents</p>
+<p>However, if it was successful, the product of such a project would be
+not just an agent that can finish one game, but likely an AGI that could
+be used in almost all or all other contexts</p>
+<p>This project would most likely take years, and most likely not be
+finished before another AI project creates an AGI, given the rate at
+which AI labs are advancing towards AGI. By definition, any AGI would be
+able to finish any game a human can finish</p>
+<p>If anyone is interested in talking with me (Joe Miller) about this
+concept, please email me at
+<code>joe_miller_93@protonmail.com</code></p>
+<hr />
+<h1 id="footnotes">Footnotes</h1>
+<section id="footnotes" class="footnotes footnotes-end-of-document"
+role="doc-endnotes">
+<hr />
+<ol>
+<li id="fn1"><p>A quest marker in Skyrim is a little icon that both:
+sits on the top of the screen on the compass area of the UI, and also
+appears to hover over what its attached to when you're close to that
+thing. There's <em>almost</em> always a quest marker to point in the
+direction you have to go, but sometimes there are multiple (probably one
+for each active quest), and sometimes there are none for the quest
+you're currently doing<a href="#fnref1" class="footnote-back"
+role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>A quest marker in Skyrim is a little icon that both:
+sits on the top of the screen on the compass area of the UI, and also
+appears to hover over what its attached to when you're close to that
+thing. There's <em>almost</em> always a quest marker to point in the
+direction you have to go, but sometimes there are multiple (probably one
+for each active quest), and sometimes there are none for the quest
+you're currently doing<a href="#fnref2" class="footnote-back"
+role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>If the agent doesn't explore the quest menu in the esc
+menu and explicitly turn off unrelated quests, there are always two
+quest markers after getting the horn of Horn of Jurgen Windcaller<a
+href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn4"><p>Parametric learning is learning that takes place during
+training of a model. This is in contrast to <em>live learning</em> (see
+requirements section above). For neural nets, parametric learning is
+learning that involves literally changing the parameters of the model.
+In general, I use <em>parametric</em> as an adjective that essentially
+means "having to do with when the model is trained", ie: non-live
+stuff<a href="#fnref4" class="footnote-back"
+role="doc-backlink">↩︎</a></p></li>
+<li id="fn5"><p>All machine learning models that have some memory
+(explicitly or implicitly) are necessarily live learners; ie: they can
+learn new information at runtime. This includes LLMs which don't have an
+explicit memory because they take as input the entire timeline of events
+(in this case: tokens) so far, including their own output<a
+href="#fnref5" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn6"><p>Chunks (<a
+href="https://en.wikipedia.org/wiki/Chunking_(psychology)">wiki</a>) and
+internal representations are internal things that represent a larger
+internal or external thing. Lossy representations are internal
+representations which don't contain enough information to fully describe
+the thing they represent; because of this, lossy representations
+represent classes of things. For instance, a "dog" representation is a
+lossy representation because it represents multiple external
+<em>dog</em>s. The internal representation of the word "the" is not
+lossy (ie: it fully represents the sequence of characters in "the") and
+its primary value is it can be used as an atom instead of a compound of
+atoms (ie: instead of carrying around and using a vector of character
+atoms, you deal with a single word atom)<a href="#fnref6"
+class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn7"><p>Arvel the Swift is guaranteed to die in Bleak Falls
+Barrow and you're supposed to get the BFB door key (Golden Claw) from
+him. You only know this if either: you talk to him and comprehend what
+he's saying or comprehend what the quest prompt text ("Retrieve the
+Golden Claw") is saying, or passively explore his body and incidentally
+take the claw. Its much more likely the agent makes it through BFB if it
+has language comprehension and can understand the claw's role<a
+href="#fnref7" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn8"><p>Parametric learning is learning that takes place during
+training of a model. This is in contrast to <em>live learning</em> (see
+requirements section above). For neural nets, parametric learning is
+learning that involves literally changing the parameters of the model.
+In general, I use <em>parametric</em> as an adjective that essentially
+means "having to do with when the model is trained", ie: non-live
+stuff<a href="#fnref8" class="footnote-back"
+role="doc-backlink">↩︎</a></p></li>
+<li id="fn9"><p>Data completion is taking what incomplete data you
+currently have and predicting or estimating what the missing data is.
+For instance, if you have a map with a missing spot in it, which a path
+goes through, then you can estimate where the path is in the missing
+spot. Inference is taking what you currently know to be true and
+predicting or estimating what is <em>also</em> true<a href="#fnref9"
+class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn10"><p>Chunks (<a
+href="https://en.wikipedia.org/wiki/Chunking_(psychology)">wiki</a>) and
+internal representations are internal things that represent a larger
+internal or external thing. Lossy representations are internal
+representations which don't contain enough information to fully describe
+the thing they represent; because of this, lossy representations
+represent classes of things. For instance, a "dog" representation is a
+lossy representation because it represents multiple external
+<em>dog</em>s. The internal representation of the word "the" is not
+lossy (ie: it fully represents the sequence of characters in "the") and
+its primary value is it can be used as an atom instead of a compound of
+atoms (ie: instead of carrying around and using a vector of character
+atoms, you deal with a single word atom)<a href="#fnref10"
+class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn11"><p>When you embed a model X into another model Y for
+training purposes, I sometimes call the model Y a <em>cradle</em> or
+cradle model<a href="#fnref11" class="footnote-back"
+role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section>
+</body>
+</html>
