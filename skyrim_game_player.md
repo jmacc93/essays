@@ -1,3 +1,10 @@
+---
+layout: none
+title: Towards an agent to beat Skyrim
+---
+
+# Towards an agent to beat Skyrim
+
 Game playing algorithms have progressed a lot in the last 20 years. The state of the art is mostly from Google DeepMind for competitive games like Go (AlphaGo, AlphaZero) and StarCraft (AlphaStar). DeepMind's [Agent57](https://arxiv.org/abs/2003.13350) (and [here](https://deepmind.google/discover/blog/agent57-outperforming-the-human-atari-benchmark/)) model can beat all 57 Atari 2600 games. DeepMind also created a generalist agent [Gato](https://arxiv.org/abs/2205.06175) (and [here](https://deepmind.google/discover/blog/a-generalist-agent/)) which can do many different things, including play games. There is also OpenAI Five which can play Dota 2 at expert levels. OpenAI was also able to make a Minecraft playing [agent using video pretraining](https://arxiv.org/abs/2206.11795) (and [here](https://openai.com/research/vpt)). Along with these well known companies' models, there are many, many lesser known models which each can play a single game well
 
 For a long time I've thought a pretty good goal for the development of game playing agents, and machine learning and AI in general, would be to beat **Skyrim** completely zero shot (ie: it knows nothing about Skyrim, and has not been exposed to any data from Skyrim at all), with no privileged information (ie: its given only what a person sees and hears), in real time
