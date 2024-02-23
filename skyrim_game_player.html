@@ -30,12 +30,6 @@
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#towards-an-agent-to-beat-skyrim"
-id="toc-towards-an-agent-to-beat-skyrim">Towards an agent to beat
-Skyrim</a></li>
-<li><a href="#required-abilities" id="toc-required-abilities">Required
-abilities</a>
-<ul>
 <li><a href="#language-comprehension"
 id="toc-language-comprehension">Language comprehension</a></li>
 <li><a href="#behavioral-mode-switching"
@@ -57,7 +51,6 @@ knowledge</a></li>
 <li><a href="#objective-comprehension-and-game-state-modeling"
 id="toc-objective-comprehension-and-game-state-modeling">Objective
 comprehension and game state modeling</a></li>
-</ul></li>
 <li><a href="#other-considerations" id="toc-other-considerations">Other
 considerations</a>
 <ul>
@@ -66,9 +59,9 @@ id="toc-condensed-and-combined-list-of-architectural-requirements">Condensed
 and combined list of architectural requirements</a></li>
 <li><a href="#multiscale-architectures"
 id="toc-multiscale-architectures">Multiscale architectures</a></li>
-<li><a href="#epiphenomenal-nature-of-most-requirements"
-id="toc-epiphenomenal-nature-of-most-requirements">Epiphenomenal nature
-of most requirements</a></li>
+<li><a href="#epiphenomenal-9-nature-of-most-requirements"
+id="toc-epiphenomenal-9-nature-of-most-requirements">Epiphenomenal
+<sup>9</sup> nature of most requirements</a></li>
 <li><a href="#what-isnt-required-in-skyrim"
 id="toc-what-isnt-required-in-skyrim">What isn't required in
 Skyrim</a></li>
@@ -81,8 +74,6 @@ id="toc-a-zero-shot-game-player">A zero-shot game player</a></li>
 <li><a href="#footnotes" id="toc-footnotes">Footnotes</a></li>
 </ul>
 </nav>
-<h1 id="towards-an-agent-to-beat-skyrim">Towards an agent to beat
-Skyrim</h1>
 <p>Game playing algorithms have progressed a lot in the last 20 years.
 The state of the art is mostly from Google DeepMind for competitive
 games like Go (AlphaGo, AlphaZero) and StarCraft (AlphaStar). DeepMind's
@@ -108,9 +99,8 @@ at all), with no privileged information (ie: its given only what a
 person sees and hears), in real time</p>
 <p>Lately, I began to wonder whether it might actually be relatively
 easy to beat Skyrim. Perhaps a program that just points in the direction
-of the nearest quest marker <a href="#fn1" class="footnote-ref"
-id="fnref1" role="doc-noteref"><sup>1</sup></a>, and attacks when it
-sees a red dot on the compass, could do it?</p>
+of the nearest quest marker <sup><a href="#fn7">7</a></sup>, and attacks
+when it sees a red dot on the compass, could do it?</p>
 <p>So I played through Skyrim, recording it and taking copious notes so
 I could scrutinize what exactly it would take for an agent to beat the
 game. Well, I can say it is <em>definitely not possible</em> to beat
@@ -119,7 +109,6 @@ I might go so far as to say that an agent that can beat Skyrim zero shot
 like this must actually be an AGI</p>
 <p>I made a condensed list of what I noted the agent would be required
 to be able to do. Here's that list:</p>
-<h1 id="required-abilities">Required abilities</h1>
 <h2 id="language-comprehension">Language comprehension</h2>
 <p>This is one of the most important requirements of the agent. The
 agent must have <em>excellent language comprehension</em>. This includes
@@ -139,12 +128,11 @@ requirements necessitate <em>very</em> sophisticated visual
 comprehension anyway</p>
 <p>For some sections, understanding what other characters are saying is
 only a minor convenience. Like, for instance, when Irileth says that she
-will "see you at the watch tower", which has a quest marker <a
-href="#fn2" class="footnote-ref" id="fnref2"
-role="doc-noteref"><sup>2</sup></a> pointing to it, where otherwise the
-closest quest marker is on Irileth herself, prompting the agent to
-simply follow her, when it is faster to go to the second quest marker at
-the watch tower and explore</p>
+will "see you at the watch tower", which has a quest marker <sup><a
+href="#fn7">7</a></sup> pointing to it, where otherwise the closest
+quest marker is on Irileth herself, prompting the agent to simply follow
+her, when it is faster to go to the second quest marker at the watch
+tower and explore</p>
 <p>Another example is when Lydia initiates a dialog with you when you're
 leaving Dragonsreach (which is the only time she does this) and there is
 a dialog option "Follow me. I need your help." which, if selected, makes
@@ -194,9 +182,8 @@ find inside it</p></li>
 <li><p>Inside the Thalmor Embassy, Malborn tells you to cause a
 distraction, and Razelan (the scene-maker) tells you he can cause a
 scene, but that he needs wine. There is no textual prompt or quest
-marker (besides the one on Malborn <a href="#fn3" class="footnote-ref"
-id="fnref3" role="doc-noteref"><sup>3</sup></a>) telling you what to
-do</p></li>
+marker (besides the one on Malborn <sup><a href="#fn2">2</a></sup>)
+telling you what to do</p></li>
 </ul>
 <p>After some point in the game, I stopped noting each time language
 comprehension is needed and just assumed it wasn't possible to get that
@@ -221,30 +208,28 @@ rotates your character</p>
 attacks the agent, they have to switch from whatever they were
 previously doing to attacking the enemy. Then, once they've defeated the
 enemy, they can switch back to whatever they were doing</p>
-<p>Behavioral mode switching is probably an incidental epiphenomenon of
-regular training, so it might not inform the model's architecture. See
-the "Epiphenomenal nature of most requirements" section below for more
-on this</p>
+<p>Behavioral mode switching is probably an incidental epiphenomenon
+<sup><a href="#fn9">9</a></sup> of regular training, so it might not
+inform the model's architecture. See the "Epiphenomenal nature of most
+requirements" section below for more on this</p>
 <h2 id="live-learning">Live learning</h2>
 <p>Live learning is learning that takes place when the model is
 <em>live</em>, ie: when the model is actively being used. This is in
-contrast to <em>parametric learning</em> <a href="#fn4"
-class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a>,
-which takes place during training</p>
+contrast to <em>parametric learning</em> <sup><a
+href="#fn1">1</a></sup>, which takes place during training</p>
 <p>This is obviously necessary, and seemingly the usual epiphenomenal
-live learning from regular training <a href="#fn5" class="footnote-ref"
-id="fnref5" role="doc-noteref"><sup>5</sup></a> would work. However, the
-agent will have to remember certain details and learned stuff for an
-<em>arbitrarily long time</em>. It isn't enough to just feed the last N
-frames, seconds of audio, and input events into the model because you
-would have to potentially feed <em>all frames, audio, and input events
-from the start of the game into the model</em></p>
+live learning from regular training <sup><a href="#fn8">8</a></sup>
+would work. However, the agent will have to remember certain details and
+learned stuff for an <em>arbitrarily long time</em>. It isn't enough to
+just feed the last N frames, seconds of audio, and input events into the
+model because you would have to potentially feed <em>all frames, audio,
+and input events from the start of the game into the model</em></p>
 <p>Since the model must play the game in real time, some storage or
 compression mechanism is absolutely necessary for arbitrarily long live
-learning to be feasible (also see <a href="#fn6" class="footnote-ref"
-id="fnref6" role="doc-noteref"><sup>6</sup></a>). So its likely live
-learning is not entirely an epiphenomenon of training, and directly
-informs the agent's architecture and functionality in general</p>
+learning to be feasible (also see <sup><a href="#fn4">4</a></sup>). So
+its likely live learning is not entirely an epiphenomenon <sup><a
+href="#fn9">9</a></sup> of training, and directly informs the agent's
+architecture and functionality in general</p>
 <p>Some sub-requirements in the category of live learning are:</p>
 <ul>
 <li><p>Skills and associations such as which keys to press to perform
@@ -273,10 +258,10 @@ required pickpocket quest in Riften</p>
 the near and far future. Timewise prediction itself doesn't necessarily
 inform the model's architecture, because the model already has a memory,
 and the ability to predict forward in time is likely just an
-epiphenomenon of training (ie: the model learns internal algorithms for
-prediction naturally from training). Though, certain architectures may
-be preferred because they perform better in timewise prediction once
-trained</p>
+epiphenomenon <sup><a href="#fn9">9</a></sup> of training (ie: the model
+learns internal algorithms for prediction naturally from training).
+Though, certain architectures may be preferred because they perform
+better in timewise prediction once trained</p>
 <p>This isn't a necessary ability just for Skyrim, its probably
 necessary for almost all games. Though, since its epiphenomenal, it is
 likely occurs in all general game players. However, It may not be
@@ -334,9 +319,8 @@ have to analogically map this onto the turnable switches in the room to
 get the solution</p>
 <p>Similarly, in the Bleak Falls Barrow door puzzle, you have to look at
 the puzzle key in your inventory (which you get from Arvel's body
-earlier <a href="#fn7" class="footnote-ref" id="fnref7"
-role="doc-noteref"><sup>7</sup></a>) and map the symbols on the key to
-the symbols on the door</p>
+earlier <sup><a href="#fn5">5</a></sup>) and map the symbols on the key
+to the symbols on the door</p>
 <p>In order to use strategies, you have to create an analogy between the
 generic version of the strategy and the situation you want to use it in.
 In the BFB door puzzle, for example, you could use the <em>brute
@@ -482,12 +466,11 @@ from the direction of the quest marker and just leads to a dead end. It
 would be much better off not taking the branch and sticking with the
 'walk straight toward the quest marker' strategy</p>
 <h2 id="prior-knowledge">Prior knowledge</h2>
-<p>Prior knowledge is parametric <a href="#fn8" class="footnote-ref"
-id="fnref8" role="doc-noteref"><sup>8</sup></a> knowledge learned during
-training. Its what the agent <em>brings in</em> to the game that it
-learned from other games and its training in general. This is everything
-from what an enemy is and the role of attacking, to what a bed is, what
-time is, and how gravity works</p>
+<p>Prior knowledge is parametric <sup><a href="#fn1">1</a></sup>
+knowledge learned during training. Its what the agent <em>brings in</em>
+to the game that it learned from other games and its training in
+general. This is everything from what an enemy is and the role of
+attacking, to what a bed is, what time is, and how gravity works</p>
 <p>There are certain pieces of prior knowledge that are essentially
 mandatory for the agent to have:</p>
 <ul>
@@ -559,8 +542,8 @@ requirements appear to be epiphenomenal and which don't:</p>
 model, narrative, game model, model of self, etc)</p></li>
 <li><p>Branched search in time using timewise prediction
 ability</p></li>
-<li><p>Inference <a href="#fn9" class="footnote-ref" id="fnref9"
-role="doc-noteref"><sup>9</sup></a> across multiple subsystems</p></li>
+<li><p>Inference <sup><a href="#fn3">3</a></sup> across multiple
+subsystems</p></li>
 <li><p>Internal representations of:</p>
 <ul>
 <li><p>The environment (3d and 2d (for training on other
@@ -607,10 +590,9 @@ and instead the buildings themselves can be represented by atomic or
 nearly atomic building representations. Another example: with LLMs, you
 can take common sequences of tokens and replace them in-place with
 single tokens or shorter token sequences. Humans do this (chunking, see
-<a href="#fn10" class="footnote-ref" id="fnref10"
-role="doc-noteref"><sup>10</sup></a>) very aggressively</p>
-<h2 id="epiphenomenal-nature-of-most-requirements">Epiphenomenal nature
-of most requirements</h2>
+<sup><a href="#fn4">4</a></sup>) very aggressively</p>
+<h2 id="epiphenomenal-9-nature-of-most-requirements">Epiphenomenal
+<sup><a href="#fn9">9</a></sup> nature of most requirements</h2>
 <p>Unfortunately, most of the agent's required abilities are probably
 epiphenomena of training and can't be as effectively reasoned about by
 the agent's developers as human-comprehensible architectures and
@@ -698,6 +680,13 @@ make certain sections much easier, and it makes the game <em>much</em>
 more interesting, but an agent that doesn't passively discover jumping,
 and never jumps, can still just as easily beat the game</p>
 <h2 id="intermediate-game-targets">Intermediate game targets</h2>
+<p>This is section is primarily an exercise in fantasy. Making an agent
+that can finish a particular game, including Skyrim, isn't really the
+point. Rather, the point is to advance the SOTA and discover new
+technologies. Skyrim is necessarily a very lax target, and the same can
+be said of any game used as a target. What determines which game to use
+as a target, and to focus on, is primarily which one will advance the
+SOTA the best and the fastest</p>
 <p>Which games could a agent's model be trained on so it could actually
 beat Skyrim zero shot? I'm fairly confident that if an agent can beat
 Skyrim it can probably beat almost any other game in existence. For
@@ -715,42 +704,42 @@ unordered. These aren't necessarily intermediate game targets, but
 targets in general. I'm primarily listing these games particularly
 because they are iconic, memorable, and I have experience with them</p>
 <ul>
-<li><p>Arcade and phone games like: Snake, Tron, Street Fighter, Tetris,
-Pac-Man</p></li>
-<li><p>Old console games: Atari and SNES games, Mario (World, Bros,
-etc), Metroid</p></li>
-<li><p>Shooters: Doom (old and new), Halo, Half-life (old and well...
-old), Far Cry</p></li>
-<li><p>Rogue-likes: Binding of Isaac, Nuclear Throne, Enter the
-Gungeon</p></li>
-<li><p>Minecraft</p></li>
-<li><p>Undertale</p></li>
-<li><p>Papers Please</p></li>
-<li><p>Diablo 1, 2</p></li>
+<li>Arcade and phone games like: Snake, Tron, Street Fighter, Tetris,
+Pac-Man</li>
+<li>Old console games: Atari and SNES games, Mario (World, Bros, etc),
+Metroid</li>
+<li>Shooters: Doom (old and new), Halo, Half-life (old and well... old),
+Far Cry</li>
+<li>Rogue-likes: Binding of Isaac, Nuclear Throne, Enter the
+Gungeon</li>
+<li>Minecraft</li>
+<li>Undertale</li>
+<li>Papers Please</li>
+<li>Diablo 1, 2</li>
 </ul>
 <p>Here are some games I think might be vastly more difficult for an
 agent to beat than Skyrim, for a variety of reason:</p>
 <ul>
-<li><p>Myst</p></li>
-<li><p>The Witness, Taiji</p></li>
-<li><p>Terraria</p></li>
-<li><p>Old 2d turn based rpgs: Chrono Trigger, Final Fantasy XYZ,
-Pokemon RGB</p></li>
-<li><p>Noita (difficulty depending on objective prompt; from relatively
-easy to almost impossible)</p></li>
-<li><p>Baba Is You</p></li>
-<li><p>Portal</p></li>
-<li><p>True rogue-likes: Rogue, NetHack, CDDA, ToME, Dwarf Fortress,
-ADOM, etc</p></li>
-<li><p>Kerbal Space Program</p></li>
-<li><p>Factorio</p></li>
+<li>Myst</li>
+<li>The Witness, Taiji</li>
+<li>Terraria</li>
+<li>Old 2d turn based rpgs: Chrono Trigger, Final Fantasy XYZ, Pokemon
+RGB</li>
+<li>Noita (difficulty depending on objective prompt; from relatively
+easy to almost impossible)</li>
+<li>Baba Is You</li>
+<li>Portal</li>
+<li>True rogue-likes: Rogue, NetHack, CDDA, ToME, Dwarf Fortress, ADOM,
+etc</li>
+<li>Kerbal Space Program</li>
+<li>Factorio</li>
 </ul>
 <p>These other games on the same engine are valid, technically, but may
 be too close to Skyrim:</p>
 <ul>
-<li><p>Fallout 3, New Vegas, and 4</p></li>
-<li><p>Starfield</p></li>
-<li><p>Elder Scrolls: Morrowind and Oblivion</p></li>
+<li>Fallout 3, New Vegas, and 4</li>
+<li>Starfield</li>
+<li>Elder Scrolls: Morrowind and Oblivion</li>
 </ul>
 <p>Keep in mind: if the agent is <em>trained</em> on a particular game,
 and the training is successful, the agent will be able to beat that
@@ -769,17 +758,16 @@ because its easier to collect training data from them at faster than
 real-time. I consider Skyrim in the category of graphically and
 processing intensive games</p>
 <p>Its likely that you can train particular <em>parts</em> of the
-agent's model in another model <a href="#fn11" class="footnote-ref"
-id="fnref11" role="doc-noteref"><sup>11</sup></a> that provides its own
-privileged objective inputs and doesn't require an objective prompt,
-thus eliminating language comprehension and objective prompt
-comprehension. Later, you can take those parts of the model and add them
-to a model with language processing and objective-prompt components. For
-example, you could train a certain model to play <em>Tetris</em> so that
-it optimizes for the game's score (as a privileged input), or so it
-optimizes for numbers of wins, then take parts of that model and embed
-it into another agent that uses an objective prompt and game modeling
-instead of privileged inputs</p>
+agent's model in another model <sup><a href="#fn6">6</a></sup> that
+provides its own privileged objective inputs and doesn't require an
+objective prompt, thus eliminating language comprehension and objective
+prompt comprehension. Later, you can take those parts of the model and
+add them to a model with language processing and objective-prompt
+components. For example, you could train a certain model to play
+<em>Tetris</em> so that it optimizes for the game's score (as a
+privileged input), or so it optimizes for numbers of wins, then take
+parts of that model and embed it into another agent that uses an
+objective prompt and game modeling instead of privileged inputs</p>
 <h2 id="a-zero-shot-game-player">A zero-shot game player</h2>
 <p>Its conceivable that with a sufficiently flexible architecture an
 agent could beat Skyrim completely zero-shot, with no privileged
@@ -807,52 +795,32 @@ not just an agent that can finish one game, but likely an AGI that could
 be used in almost all or all other contexts</p>
 <p>This project would most likely take years, and most likely not be
 finished before another AI project creates an AGI, given the rate at
-which AI labs are advancing towards AGI. By definition, any AGI would be
-able to finish any game a human can finish</p>
+which AI labs are advancing towards AGI. By definition, any AGI could
+finish any game a human can finish, so another lab's AGI could beat
+Skyrim just the same</p>
 <p>If anyone is interested in talking with me (Joe Miller) about this
 concept, please email me at
 <code>joe_miller_93@protonmail.com</code></p>
 <hr />
 <h1 id="footnotes">Footnotes</h1>
-<section id="footnotes" class="footnotes footnotes-end-of-document"
-role="doc-endnotes">
-<hr />
-<ol>
-<li id="fn1"><p>A quest marker in Skyrim is a little icon that both:
-sits on the top of the screen on the compass area of the UI, and also
-appears to hover over what its attached to when you're close to that
-thing. There's <em>almost</em> always a quest marker to point in the
-direction you have to go, but sometimes there are multiple (probably one
-for each active quest), and sometimes there are none for the quest
-you're currently doing<a href="#fnref1" class="footnote-back"
-role="doc-backlink">↩︎</a></p></li>
-<li id="fn2"><p>A quest marker in Skyrim is a little icon that both:
-sits on the top of the screen on the compass area of the UI, and also
-appears to hover over what its attached to when you're close to that
-thing. There's <em>almost</em> always a quest marker to point in the
-direction you have to go, but sometimes there are multiple (probably one
-for each active quest), and sometimes there are none for the quest
-you're currently doing<a href="#fnref2" class="footnote-back"
-role="doc-backlink">↩︎</a></p></li>
-<li id="fn3"><p>If the agent doesn't explore the quest menu in the esc
-menu and explicitly turn off unrelated quests, there are always two
-quest markers after getting the horn of Horn of Jurgen Windcaller<a
-href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn4"><p>Parametric learning is learning that takes place during
-training of a model. This is in contrast to <em>live learning</em> (see
-requirements section above). For neural nets, parametric learning is
-learning that involves literally changing the parameters of the model.
-In general, I use <em>parametric</em> as an adjective that essentially
-means "having to do with when the model is trained", ie: non-live
-stuff<a href="#fnref4" class="footnote-back"
-role="doc-backlink">↩︎</a></p></li>
-<li id="fn5"><p>All machine learning models that have some memory
-(explicitly or implicitly) are necessarily live learners; ie: they can
-learn new information at runtime. This includes LLMs which don't have an
-explicit memory because they take as input the entire timeline of events
-(in this case: tokens) so far, including their own output<a
-href="#fnref5" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn6"><p>Chunks (<a
+<p><span id="fn1">1</span>: Parametric learning is learning that takes
+place during training of a model. This is in contrast to <em>live
+learning</em> (see requirements section above). For neural nets,
+parametric learning is learning that involves literally changing the
+parameters of the model. In general, I use <em>parametric</em> as an
+adjective that essentially means "having to do with when the model is
+trained", ie: non-live stuff</p>
+<p><span id="fn2">2</span>: If the agent doesn't explore the quest menu
+in the esc menu and explicitly turn off unrelated quests, there are
+always two quest markers after getting the horn of Horn of Jurgen
+Windcaller</p>
+<p><span id="fn3">3</span>: Data completion is taking what incomplete
+data you currently have and predicting or estimating what the missing
+data is. For instance, if you have a map with a missing spot in it,
+which a path goes through, then you can estimate where the path is in
+the missing spot. Inference is taking what you currently know to be true
+and predicting or estimating what is <em>also</em> true</p>
+<p><span id="fn4">4</span>: Chunks (<a
 href="https://en.wikipedia.org/wiki/Chunking_(psychology)">wiki</a>) and
 internal representations are internal things that represent a larger
 internal or external thing. Lossy representations are internal
@@ -864,50 +832,40 @@ lossy representation because it represents multiple external
 lossy (ie: it fully represents the sequence of characters in "the") and
 its primary value is it can be used as an atom instead of a compound of
 atoms (ie: instead of carrying around and using a vector of character
-atoms, you deal with a single word atom)<a href="#fnref6"
-class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn7"><p>Arvel the Swift is guaranteed to die in Bleak Falls
-Barrow and you're supposed to get the BFB door key (Golden Claw) from
-him. You only know this if either: you talk to him and comprehend what
-he's saying or comprehend what the quest prompt text ("Retrieve the
-Golden Claw") is saying, or passively explore his body and incidentally
-take the claw. Its much more likely the agent makes it through BFB if it
-has language comprehension and can understand the claw's role<a
-href="#fnref7" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn8"><p>Parametric learning is learning that takes place during
-training of a model. This is in contrast to <em>live learning</em> (see
-requirements section above). For neural nets, parametric learning is
-learning that involves literally changing the parameters of the model.
-In general, I use <em>parametric</em> as an adjective that essentially
-means "having to do with when the model is trained", ie: non-live
-stuff<a href="#fnref8" class="footnote-back"
-role="doc-backlink">↩︎</a></p></li>
-<li id="fn9"><p>Data completion is taking what incomplete data you
-currently have and predicting or estimating what the missing data is.
-For instance, if you have a map with a missing spot in it, which a path
-goes through, then you can estimate where the path is in the missing
-spot. Inference is taking what you currently know to be true and
-predicting or estimating what is <em>also</em> true<a href="#fnref9"
-class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn10"><p>Chunks (<a
-href="https://en.wikipedia.org/wiki/Chunking_(psychology)">wiki</a>) and
-internal representations are internal things that represent a larger
-internal or external thing. Lossy representations are internal
-representations which don't contain enough information to fully describe
-the thing they represent; because of this, lossy representations
-represent classes of things. For instance, a "dog" representation is a
-lossy representation because it represents multiple external
-<em>dog</em>s. The internal representation of the word "the" is not
-lossy (ie: it fully represents the sequence of characters in "the") and
-its primary value is it can be used as an atom instead of a compound of
-atoms (ie: instead of carrying around and using a vector of character
-atoms, you deal with a single word atom)<a href="#fnref10"
-class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn11"><p>When you embed a model X into another model Y for
-training purposes, I sometimes call the model Y a <em>cradle</em> or
-cradle model<a href="#fnref11" class="footnote-back"
-role="doc-backlink">↩︎</a></p></li>
-</ol>
-</section>
+atoms, you deal with a single word atom)</p>
+<p><span id="fn5">5</span>: Arvel the Swift is guaranteed to die in
+Bleak Falls Barrow and you're supposed to get the BFB door key (Golden
+Claw) from him. You only know this if either: you talk to him and
+comprehend what he's saying or comprehend what the quest prompt text
+("Retrieve the Golden Claw") is saying, or passively explore his body
+and incidentally take the claw. Its much more likely the agent makes it
+through BFB if it has language comprehension and can understand the
+claw's role</p>
+<p><span id="fn6">6</span>: When you embed a model X into another model
+Y for training purposes, I sometimes call the model Y a <em>cradle</em>
+or cradle model</p>
+<p><span id="fn7">7</span>: A quest marker in Skyrim is a little icon
+that both: sits on the top of the screen on the compass area of the UI,
+and also appears to hover over what its attached to when you're close to
+that thing. There's <em>almost</em> always a quest marker to point in
+the direction you have to go, but sometimes there are multiple (probably
+one for each active quest), and sometimes there are none for the quest
+you're currently doing</p>
+<p><span id="fn8">8</span>: All machine learning models that have some
+memory (explicitly or implicitly) are necessarily live learners; ie:
+they can learn new information at runtime. This includes LLMs which
+don't have an explicit memory because they take as input the entire
+timeline of events (in this case: tokens) so far, including their own
+output</p>
+<p><span id="fn9">9</span>: My use of epiphenomenon in this essay is
+atypical for machine learning jargon. Wiktionary defines "epiphenomenon"
+as: "[Noun:] An activity, process, or state that is the result of
+another; a by-product, a consequence". I'm using it to take the place of
+saying something like: "This is a phenomenon created by another
+phenomenon and is somehow <em>hosted</em> or <em>encoded</em> inside
+that other phenomenon". For example, ability X being an epiphenomenon of
+training means that the phenomenon of training somehow produces (we
+don't know how) the phenomenon of ability X, and ability X is hosted /
+encoded inside the effects of training</p>
 </body>
 </html>
