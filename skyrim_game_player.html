@@ -59,9 +59,9 @@ id="toc-condensed-and-combined-list-of-architectural-requirements">Condensed
 and combined list of architectural requirements</a></li>
 <li><a href="#multiscale-architectures"
 id="toc-multiscale-architectures">Multiscale architectures</a></li>
-<li><a href="#epiphenomenal-9-nature-of-most-requirements"
-id="toc-epiphenomenal-9-nature-of-most-requirements">Epiphenomenal
-<sup>9</sup> nature of most requirements</a></li>
+<li><a href="#epiphenomenal-nature-of-most-requirements"
+id="toc-epiphenomenal-nature-of-most-requirements">Epiphenomenal nature
+of most requirements</a></li>
 <li><a href="#what-isnt-required-in-skyrim"
 id="toc-what-isnt-required-in-skyrim">What isn't required in
 Skyrim</a></li>
@@ -70,7 +70,7 @@ id="toc-intermediate-game-targets">Intermediate game targets</a></li>
 <li><a href="#a-zero-shot-game-player"
 id="toc-a-zero-shot-game-player">A zero-shot game player</a></li>
 </ul></li>
-<li><a href="#future-work" id="toc-future-work">Future work</a></li>
+<li><a href="#conclusions" id="toc-conclusions">Conclusions</a></li>
 <li><a href="#footnotes" id="toc-footnotes">Footnotes</a></li>
 </ul>
 </nav>
@@ -289,10 +289,15 @@ safe</p></li>
 </ul>
 <h2 id="planning">Planning</h2>
 <p>Planning is like doing a search using timewise prediction for
-possible futures that accomplish some goal. Like timewise prediction
-itself, this is likely an epiphenomenon of training, so its probably not
-meaningful to say what form it actually takes internally. Again, certain
-architectures might result in agents that plan better</p>
+possible futures that accomplish some goal. There has been some research
+done into using various training techniques and external search
+algorithms to create better discrete sequence predictors using search,
+but, as far as I know, no techniques have been developed for continuous
+systems (like for internal 3d world representations). Because LLMs in
+particular supposedly perform generally better with search via external
+algorithms, it isn't likely they learn such effective internal search
+algorithms epiphenomenally. It seems reasonable that this agent would
+need external search proceedures for planning to be effective</p>
 <p>Some examples are:</p>
 <ul>
 <li><p>Chaining events to progress. eg: I have to give this guy wine, to
@@ -591,12 +596,13 @@ nearly atomic building representations. Another example: with LLMs, you
 can take common sequences of tokens and replace them in-place with
 single tokens or shorter token sequences. Humans do this (chunking, see
 <sup><a href="#fn4">4</a></sup>) very aggressively</p>
-<h2 id="epiphenomenal-9-nature-of-most-requirements">Epiphenomenal
-<sup><a href="#fn9">9</a></sup> nature of most requirements</h2>
+<h2 id="epiphenomenal-nature-of-most-requirements">Epiphenomenal nature
+of most requirements</h2>
 <p>Unfortunately, most of the agent's required abilities are probably
-epiphenomena of training and can't be as effectively reasoned about by
-the agent's developers as human-comprehensible architectures and
-algorithms which give the agent those abilities</p>
+epiphenomena <sup><a href="#fn9">9</a></sup> of training and can't be as
+effectively reasoned about by the agent's developers as
+human-comprehensible architectures and algorithms which give the agent
+those abilities</p>
 <p>An example of this is pathfinding and navigation around obstacles.
 There are certain algorithms for pathfinding (like A*) which are
 extremely fast, relatively efficient, and are human-comprehensible, but
@@ -784,20 +790,27 @@ the agent would probably take <em>much</em> longer to beat Skyrim, as it
 would have to figure out <em>everything</em>, not just Skyrim-specific
 stuff, like: how to control the player, what enemies and combat are,
 what an inventory is, how to heal and use items, etc</p>
-<h1 id="future-work">Future work</h1>
+<h1 id="conclusions">Conclusions</h1>
 <p>A project to make a game playing agent that can beat Skyrim
 completely zero-shot, with no privileged inputs, and in real time, would
 be a massive undertaking, requiring huge amounts of resources and many
 subprojects, including researching new architectures, developing
-training programs, and training intermediate agents</p>
-<p>However, if it was successful, the product of such a project would be
-not just an agent that can finish one game, but likely an AGI that could
-be used in almost all or all other contexts</p>
+training programs, and training intermediate agents. However, if it was
+successful, the product of such a project would be not just an agent
+that can finish one game, but likely an AGI that could be used in almost
+all or all other contexts</p>
 <p>This project would most likely take years, and most likely not be
 finished before another AI project creates an AGI, given the rate at
 which AI labs are advancing towards AGI. By definition, any AGI could
 finish any game a human can finish, so another lab's AGI could beat
 Skyrim just the same</p>
+<p>I've pushed my AGI prediction dates back by a few years now after
+doing this little analysis project because its illuminated how many
+capabilities an AGI would actually have to have to do simple things like
+play Skyrim. The SOTA integrates a few of these capabilities together,
+but we <em>really</em> don't seem close at all to making such an agent.
+The rate of progress towards it is very fast, though, and it will only
+increase. Time will tell</p>
 <p>If anyone is interested in talking with me (Joe Miller) about this
 concept, please email me at
 <code>joe_miller_93@protonmail.com</code></p>

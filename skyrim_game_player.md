@@ -97,7 +97,7 @@ Some examples of this (in Skyrim) include:
 
 ## Planning
 
-Planning is like doing a search using timewise prediction for possible futures that accomplish some goal. Like timewise prediction itself, this is likely an epiphenomenon of training, so its probably not meaningful to say what form it actually takes internally. Again, certain architectures might result in agents that plan better
+Planning is like doing a search using timewise prediction for possible futures that accomplish some goal. There has been some research done into using various training techniques and external search algorithms to create better discrete sequence predictors using search, but, as far as I know, no techniques have been developed for continuous systems (like for internal 3d world representations). Because LLMs in particular supposedly perform generally better with search via external algorithms, it isn't likely they learn such effective internal search algorithms epiphenomenally. It seems reasonable that this agent would need external search proceedures for planning to be effective
 
 Some examples are:
 
@@ -245,9 +245,9 @@ An example of a single-scale architecture is an LLM that predicts the next token
 
 There are also in-place multiscale models. These don't use one structure per scale, but just one structure with features of different scales encoded in it. These are heterogeneous structures that mix features of different scales in the same location. For example, picture a town around you: you ignore the small scale details of the buildings and instead the buildings themselves can be represented by atomic or nearly atomic building representations. Another example: with LLMs, you can take common sequences of tokens and replace them in-place with single tokens or shorter token sequences. Humans do this (chunking, see <sup>[4](#fn4)</sup>) very aggressively
 
-## Epiphenomenal <sup>[9](#fn9)</sup> nature of most requirements
+## Epiphenomenal nature of most requirements
 
-Unfortunately, most of the agent's required abilities are probably epiphenomena of training and can't be as effectively reasoned about by the agent's developers as human-comprehensible architectures and algorithms which give the agent those abilities
+Unfortunately, most of the agent's required abilities are probably epiphenomena <sup>[9](#fn9)</sup> of training and can't be as effectively reasoned about by the agent's developers as human-comprehensible architectures and algorithms which give the agent those abilities
 
 An example of this is pathfinding and navigation around obstacles. There are certain algorithms for pathfinding (like A*) which are extremely fast, relatively efficient, and are human-comprehensible, but if the agent's internal representation of its environment is encoded in some learned form (which is probably the case), then you might not be able to design an algorithm for this learned form specifically
 
@@ -323,13 +323,13 @@ Its conceivable that with a sufficiently flexible architecture an agent could be
 
 This sort of agent could be trained on other tasks (probably artificial, contrived tasks) and because those other tasks could be made to be really fast, the agent would probably train much faster. Though, the agent would probably take *much* longer to beat Skyrim, as it would have to figure out *everything*, not just Skyrim-specific stuff, like: how to control the player, what enemies and combat are, what an inventory is, how to heal and use items, etc
 
-# Future work
+# Conclusions
 
-A project to make a game playing agent that can beat Skyrim completely zero-shot, with no privileged inputs, and in real time, would be a massive undertaking, requiring huge amounts of resources and many subprojects, including researching new architectures, developing training programs, and training intermediate agents
-
-However, if it was successful, the product of such a project would be not just an agent that can finish one game, but likely an AGI that could be used in almost all or all other contexts
+A project to make a game playing agent that can beat Skyrim completely zero-shot, with no privileged inputs, and in real time, would be a massive undertaking, requiring huge amounts of resources and many subprojects, including researching new architectures, developing training programs, and training intermediate agents. However, if it was successful, the product of such a project would be not just an agent that can finish one game, but likely an AGI that could be used in almost all or all other contexts
 
 This project would most likely take years, and most likely not be finished before another AI project creates an AGI, given the rate at which AI labs are advancing towards AGI. By definition, any AGI could finish any game a human can finish, so another lab's AGI could beat Skyrim just the same
+
+I've pushed my AGI prediction dates back by a few years now after doing this little analysis project because its illuminated how many capabilities an AGI would actually have to have to do simple things like play Skyrim. The SOTA integrates a few of these capabilities together, but we *really* don't seem close at all to making such an agent. The rate of progress towards it is very fast, though, and it will only increase. Time will tell
 
 If anyone is interested in talking with me (Joe Miller) about this concept, please email me at `joe_miller_93@protonmail.com`
 
