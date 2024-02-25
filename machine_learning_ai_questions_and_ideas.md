@@ -21,10 +21,24 @@ Solution idea: RLHF (for normal speaking) and tree of thought?
 
 For instance: smaller, faster, etc
 
+##
+
 
 # Ideas
 
 I'm going to try to make an effort to write down my machine learning and AI ideas here
+
+## Image correction ML model
+
+Think: Stable Diffusion makes *almost* correct images, this model would go through and fix small details
+
+## Warp diffusion
+
+This is like a generative image diffusion model, but uses warp noise (randomly warped image) instead of additive noise
+
+## Language / code correction LLM
+
+An LLM that takes some code or general language that's been corrupted somehow (eg: replace random characters, words; swap words, etc) and it rebuilds the un-corrupted version
 
 ## Unit vector training
 
