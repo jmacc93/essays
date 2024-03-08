@@ -17,12 +17,31 @@ How do you train an LLM to say "I don't know" if it can't actually produce the c
 
 Solution idea: RLHF (for normal speaking) and tree of thought?
 
-## How do you make ANNs more resource efficient? (Open ended)
+Another solution idea: look at training examples with high losses (or another metric?) and exclude them from training. Similarly: during training, use a loss function that is zero after some point somehow to discourage learning expensive-to-learn things
+
+## How do you make ANNs more resource efficient? (Open ended)?
 
 For instance: smaller, faster, etc
 
-##
+## Is it true that the more losses the better when training an ANN?
 
+Relevant: see the `Equivalence between training, test sets and equation solving` idea below
+
+The more information you can provide about the problem you want to solve, the better; and you can only provide information via losses (roughly speaking)
+
+## How do you make a ML model use analogy?
+
+Analogy is like some partial similarity between two structures. ie: There is a equivalence relation between some elements in two structures
+
+Humans probably encode
+
+## How do you train an LLM which searches?
+
+If `X' = p(X, s(q(X)))` where `p` predicts the next token from the original input and a result object, `s` is a non-differentiable search function that returns result objects, and `q` is a query-making function. Ideally, `s` is actually searching a database. Since `s` isn't differentiable, you can't backprop through it. So how do you train `s`?
+
+## In LLMs, does presenting facts on input during training prevent learning of those facts?
+
+For example: "The dog's name is Walter. [...]. Bla bla. The dog's name is " and the model is trained to complete the text with : "Walter". But it doesn't need to have encoded that response parametrically because its presented on input
 
 # Ideas
 
@@ -69,4 +88,3 @@ Use an agent to optimize a system, rather than use gradient descent, or other te
 Understanding and knowledge seem to lie on a continuum, where understanding is the equivalent of deep, highly-encoded, parametric knowledge, and knowledge is the equivalent of shallow, single-step understanding
 
 In a sense, understanding is generalized knowledge: knowledge that applies to lots of different situations
-
